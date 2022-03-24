@@ -259,13 +259,15 @@ UINT CommThread:: MinusThreadProc(LPVOID Param)
 	commthread->inputstring.Format("%d",commthread-> InputValue);
 	addthread->GetDlgItem(IDC_EDIT_DISPLAY) -> SetWindowText(commthread->inputstring);
 	
+	//setup the wait thrad event and communicated with main thread(process)
+	
 	return TRUE;
 }
 
 
 void CMultiThreadDemoDlg::OnBnClickedButtonpress()
 {
-	// TODO: ¦b¦¹¥[¤J±±¨î¶µ§iª¾³B²z±`¦¡µ{¦¡½X
+	// TODO: åœ¨æ­¤åŠ å…¥æ§åˆ¶é …å‘ŠçŸ¥è™•ç†å¸¸å¼ç¨‹å¼ç¢¼
 	//TimerThread* timethread  = new TimerThread;
 	
 
@@ -322,7 +324,7 @@ void CMultiThreadDemoDlg::OnBnClickedButtonpress()
 
 void CMultiThreadDemoDlg::OnBnClickedButtonpause()
 {
-	// TODO: ¦b¦¹¥[¤J±±¨î¶µ§iª¾³B²z±`¦¡µ{¦¡½X
+	// TODO: åœ¨æ­¤åŠ å…¥æ§åˆ¶é …å‘ŠçŸ¥è™•ç†å¸¸å¼ç¨‹å¼ç¢¼
 	if(AfxMessageBox("Close Program",MB_YESNO) == IDYES)
 	{
 		TRACE("YES \n"); // Debug skill similar to assert
@@ -342,7 +344,7 @@ void CMultiThreadDemoDlg::OnBnClickedButtonpause()
 
 void CMultiThreadDemoDlg::OnBnClickedButtonAdd()
 {
-	// TODO: ¦b¦¹¥[¤J±±¨î¶µ§iª¾³B²z±`¦¡µ{¦¡½X
+	// TODO: åœ¨æ­¤åŠ å…¥æ§åˆ¶é …å‘ŠçŸ¥è™•ç†å¸¸å¼ç¨‹å¼ç¢¼
 	CWinThread* addbeginthread = AfxBeginThread(CommThread::AddThreadProc,this,THREAD_PRIORITY_NORMAL);
 
 }
@@ -350,14 +352,14 @@ void CMultiThreadDemoDlg::OnBnClickedButtonAdd()
 
 void CMultiThreadDemoDlg::OnBnClickedButtonMinus()
 {
-	// TODO: ¦b¦¹¥[¤J±±¨î¶µ§iª¾³B²z±`¦¡µ{¦¡½X
+	// TODO: åœ¨æ­¤åŠ å…¥æ§åˆ¶é …å‘ŠçŸ¥è™•ç†å¸¸å¼ç¨‹å¼ç¢¼
 	CWinThread* addbeginthread = AfxBeginThread(CommThread::MinusThreadProc,this,THREAD_PRIORITY_NORMAL);
 }
 
 
 void CMultiThreadDemoDlg::OnClose()
 {
-	// TODO: ¦b¦¹¥[¤J±zªº°T®§³B²z±`¦¡µ{¦¡½X©M (©Î) ©I¥s¹w³]­È
+	// TODO: åœ¨æ­¤åŠ å…¥æ‚¨çš„è¨Šæ¯è™•ç†å¸¸å¼ç¨‹å¼ç¢¼å’Œ (æˆ–) å‘¼å«é è¨­å€¼
 	// release the memory in oder to memory leak
 	delete timethread;
 	delete commthread;
