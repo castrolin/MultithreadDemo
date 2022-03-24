@@ -82,5 +82,6 @@ public:
 	CString	inputstring;
 	HANDLE mainevent;
 	HANDLE addevent;
+	HANDLE minusevent;
 	
 };

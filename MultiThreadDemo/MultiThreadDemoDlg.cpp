@@ -236,30 +236,89 @@ UINT TimerThread::MyThreadProc(LPVOID Param)
 UINT CommThread::AddThreadProc(LPVOID Param)
 {
 	/* check the other event state and decide what to do */
+	SetEvent(commthread->addevent);
+	if(WaitForSingleObject(commthread->minusevent,INFINITE) == WAIT_OBJECT_0)
+	{
+		TRACE("The  minus state is finished \n");
+		Sleep(10000);
+		CMultiThreadDemoDlg* addthread =  (CMultiThreadDemoDlg*)(Param);
+		addthread->GetDlgItem(IDC_EDIT_DISPLAY)-> GetWindowText(commthread->inputstring);
+		commthread-> InputValue = atoi(commthread->inputstring); // string into int
+		commthread-> InputValue ++;
+		commthread->inputstring.Format("%d",commthread-> InputValue);
+		addthread->GetDlgItem(IDC_EDIT_DISPLAY) -> SetWindowText(commthread->inputstring);	
+		//CloseHandle(commthread->minusevent);
 
-	CMultiThreadDemoDlg* addthread =  (CMultiThreadDemoDlg*)(Param);
-	addthread->GetDlgItem(IDC_EDIT_DISPLAY)-> GetWindowText(commthread->inputstring);
-
-	commthread-> InputValue = atoi(commthread->inputstring); // string into int
-	commthread-> InputValue ++;
-	commthread->inputstring.Format("%d",commthread-> InputValue);
-	addthread->GetDlgItem(IDC_EDIT_DISPLAY) -> SetWindowText(commthread->inputstring);
-
-	return TRUE;
+		return TRUE;
+	}
+	if(WaitForSingleObject(commthread->minusevent,INFINITE) == WAIT_TIMEOUT)
+	{
+		TRACE("The minus state is still running \n");
+		Sleep(5000);
+	}
+	if(WaitForSingleObject(commthread->minusevent,INFINITE) == WAIT_FAILED)
+	{
+		TRACE("minus state be Faied \n");
+		Sleep(10000);
+		CMultiThreadDemoDlg* addthread =  (CMultiThreadDemoDlg*)(Param);
+		addthread->GetDlgItem(IDC_EDIT_DISPLAY)-> GetWindowText(commthread->inputstring);
+		commthread-> InputValue = atoi(commthread->inputstring); // string into int
+		commthread-> InputValue ++;
+		commthread->inputstring.Format("%d",commthread-> InputValue);
+		addthread->GetDlgItem(IDC_EDIT_DISPLAY) -> SetWindowText(commthread->inputstring);
+		return FALSE;
+	}
+	else
+	{
+		TRACE("IDK \n");
+		//CloseHandle(commthread -> minusevent);
+	}
+	
+	
 }
 
 UINT CommThread:: MinusThreadProc(LPVOID Param)
 {
 	/* check the other event state and decide what to do */
-	CMultiThreadDemoDlg* addthread =  (CMultiThreadDemoDlg*)(Param);
-	addthread->GetDlgItem(IDC_EDIT_DISPLAY)-> GetWindowText(commthread->inputstring);
+	SetEvent(commthread->minusevent);
+	if(WaitForSingleObject(commthread->addevent,10) == WAIT_OBJECT_0)
+	{
+		TRACE("The  add state is finished \n");
+		Sleep(1000);
+		CMultiThreadDemoDlg* minusthread =  (CMultiThreadDemoDlg*)(Param);
+		minusthread->GetDlgItem(IDC_EDIT_DISPLAY)-> GetWindowText(commthread->inputstring);
+		commthread-> InputValue = atoi(commthread->inputstring); // string into int
+		commthread-> InputValue --;
+		commthread->inputstring.Format("%d",commthread-> InputValue);
+		minusthread->GetDlgItem(IDC_EDIT_DISPLAY) -> SetWindowText(commthread->inputstring);	
 
-	commthread-> InputValue = atoi(commthread->inputstring); // string into int
-	commthread-> InputValue --;
-	commthread->inputstring.Format("%d",commthread-> InputValue);
-	addthread->GetDlgItem(IDC_EDIT_DISPLAY) -> SetWindowText(commthread->inputstring);
+		return TRUE;
+	}
+	if(WaitForSingleObject(commthread->addevent,10) == WAIT_TIMEOUT)
+	{
+		TRACE("The add state is still running \n");
+		Sleep(5000);
+	}
+	if(WaitForSingleObject(commthread->addevent,10) == WAIT_FAILED)
+	{
+		TRACE("add state be Faied \n");
+		Sleep(1000);
+		CMultiThreadDemoDlg* minusthread =  (CMultiThreadDemoDlg*)(Param);
+		minusthread->GetDlgItem(IDC_EDIT_DISPLAY)-> GetWindowText(commthread->inputstring);
+		commthread-> InputValue = atoi(commthread->inputstring); // string into int
+		commthread-> InputValue ++;
+		commthread->inputstring.Format("%d",commthread-> InputValue);
+		minusthread->GetDlgItem(IDC_EDIT_DISPLAY) -> SetWindowText(commthread->inputstring);
+		return FALSE;
+	}
+	else
+	{
+		TRACE("IDK \n");
+		//CloseHandle(commthread -> addevent);
+	}
+
 	
-	return TRUE;
+	
 }
 
 
@@ -343,7 +402,9 @@ void CMultiThreadDemoDlg::OnBnClickedButtonpause()
 void CMultiThreadDemoDlg::OnBnClickedButtonAdd()
 {
 	// TODO: 在此加入控制項告知處理常式程式碼
+	commthread->addevent = CreateEvent(NULL,FALSE,TRUE,NULL);
 	CWinThread* addbeginthread = AfxBeginThread(CommThread::AddThreadProc,this,THREAD_PRIORITY_NORMAL);
+	//CloseHandle(commthread->minusevent);
 
 }
 
@@ -351,7 +412,9 @@ void CMultiThreadDemoDlg::OnBnClickedButtonAdd()
 void CMultiThreadDemoDlg::OnBnClickedButtonMinus()
 {
 	// TODO: 在此加入控制項告知處理常式程式碼
+	commthread ->minusevent = CreateEvent(NULL,FALSE,TRUE,NULL);
 	CWinThread* addbeginthread = AfxBeginThread(CommThread::MinusThreadProc,this,THREAD_PRIORITY_NORMAL);
+	
 }
 
 
@@ -361,6 +424,7 @@ void CMultiThreadDemoDlg::OnClose()
 	// release the memory in oder to memory leak
 	delete timethread;
 	delete commthread;
+	
 
 
 	CDialogEx::OnClose();
